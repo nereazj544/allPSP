@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -23,6 +24,7 @@ public class Receptor implements Runnable {
 	@Override
 	public void run() {
 		try {
+			socket.setSoTimeout(30000);
 			DataInputStream in = new DataInputStream(socket.getInputStream());
 			String s;
 			while (true) {
@@ -30,6 +32,8 @@ public class Receptor implements Runnable {
 				System.out.println(socket.getInetAddress() + " -> " + s);
 				almacen.almacenar(s);
 			}
+		} catch (SocketTimeoutException e){
+			System.out.println("Error: tiempo de espera agotado");
 		} catch (EOFException e) {
 			System.out.println(socket.getInetAddress() + ": EOF");
 		} catch (IOException e) {
@@ -37,7 +41,8 @@ public class Receptor implements Runnable {
 		} finally {
 			emisor.cancel(true);
 			if (!emisor.isDone())
-				try {System.out.println(socket.getInetAddress() + ": CONEXIÓN FINALIZADA");
+				try {
+					System.out.println(socket.getInetAddress() + ": CONEXIÓN FINALIZADA");
 					emisor.get();
 				} catch (InterruptedException | ExecutionException e) {
 					e.printStackTrace();

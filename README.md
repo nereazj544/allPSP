@@ -4,7 +4,7 @@ Día 10 de junui de 2024
 
 # TODO
 - Tema 2
-    - [ ]  Barbero Dormilon
+    - [X]  Barbero Dormilon
     - [ ]  Filósofos chinos
     - [ ]  Montaje
     - [ ]  Ordenación

@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 
 public class Receptor implements Runnable {
 
@@ -21,6 +22,7 @@ public class Receptor implements Runnable {
 		boolean fin = false;
 		try (DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				DataInputStream in = new DataInputStream(socket.getInputStream())) {
+				socket.setSoTimeout(10000);
 			while (!fin) {
 				String s = in.readUTF();
 				System.out.println(socket.getInetAddress() + "\n" + s);
@@ -32,5 +34,4 @@ public class Receptor implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
 }

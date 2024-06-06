@@ -68,7 +68,7 @@ public class Main extends JFrame implements WindowListener {
 	private void iniciar() {
 		setVisible(true);
 		
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 100; i++){
 			if (Math.random() < 0.5) {
 				Nadador n = new Nadador(piscina, getName());
 				n.start();

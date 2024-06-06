@@ -14,8 +14,4 @@ public class Nadador extends Thread{
         p.nadar(nombre);
     }
 
-    
-    
-
-
 }

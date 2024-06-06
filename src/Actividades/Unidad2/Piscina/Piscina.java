@@ -46,11 +46,11 @@ public class Piscina {
         actualizar(nombre + " ha entrado a la piscina.\n");
         if (nombre.equals("h")) {
             h++;
-        }else if (nombre.equals("m")) {
+        } else if (nombre.equals("m")) {
             m++;
-        }else if (nombre.equals("n")) {
-n++;
-        }else if (nombre.equals("s")) {
+        } else if (nombre.equals("n")) {
+            n++;
+        } else if (nombre.equals("s")) {
             s++;
         }
 
@@ -62,11 +62,12 @@ n++;
 
     }
 
-    public void pausar(){
-        p=true;
+    public void pausar() {
+        p = true;
     }
-    public void reanudar(){
-        p=false;
+
+    public void reanudar() {
+        p = false;
         semaphore.release();
     }
 

@@ -74,9 +74,13 @@ public class Main extends JFrame implements WindowListener {
 			Cliente cliente = new Cliente(i, tBarberia);
 			Thread t = new Thread(cliente);
 			t.start();
+			Barbero b = new Barbero(tBarberia);
+			Thread bar = new Thread(b);
+			bar.start();
 
 			try {
 				t.sleep(500);
+				bar.sleep(500);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

@@ -1,6 +1,9 @@
 # Examen
 Día 10 de junui de 2024
 
+- Tipo test : 
+- Ejercicio practico :
+
 
 # TODO
 - Tema 2

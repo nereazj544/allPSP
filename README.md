@@ -1,8 +1,8 @@
 # Examen
-Día 10 de junui de 2024
+Día 10 de junui de 2024 (Empieza a las seis)
 
-- Tipo test : 
-- Ejercicio practico :
+- Tipo test - unidad 2
+- Ejercicio practico.
 
 
 # TODO

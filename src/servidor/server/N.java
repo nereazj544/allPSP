@@ -1,7 +1,6 @@
 package servidor.server;
 
 import java.io.ByteArrayInputStream;
-import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
@@ -10,12 +9,12 @@ import java.io.UTFDataFormatException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
+import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Base64;
@@ -29,11 +28,14 @@ public class N implements Runnable {
     private Socket socket;
     private DataInputStream in;
     private DataOutputStream out;
+    private KeyStore kStore;
 
     // Constructor
-    public N(Socket socket) throws IOException {
+    public N(Socket socket, KeyStore kStore) throws IOException {
         // Lo que simpre hay que poner:
         this.socket = socket;
+        this.kStore = kStore;
+
         out = new DataOutputStream(socket.getOutputStream());
         in = new DataInputStream(socket.getInputStream());
 
@@ -64,13 +66,13 @@ public class N implements Runnable {
             Respuesta("ERROR: Se esperaba una peticion.");
         } catch (IOException e) {
             Respuesta("ERROR: " + e.getLocalizedMessage());
-        } finally {
-            try {
-                socket.close(); // Se cierra el socket
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        // } finally {
+        //     try {
+        //         socket.close(); // Se cierra el socket
+        //     } catch (IOException e) {
+        //         // TODO Auto-generated catch block
+        //         e.printStackTrace();
+        //     }
         }
     }
 
@@ -96,7 +98,10 @@ public class N implements Runnable {
             String alias = in.readUTF();
             byte[] data = in.readAllBytes();
 
-            Certificate cert = Server.kStore.getCertificate(alias);
+            kStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            kStore.load(null, null);
+
+            Certificate cert =kStore.getCertificate(alias);
             // Obtenemos el certificado
 
             if (cert != null) {
@@ -117,24 +122,39 @@ public class N implements Runnable {
             }
         } catch (SocketTimeoutException e) {
             Respuesta("Error: Tiempo de espera agotado");
-        } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | CertificateException  e) {
             Respuesta(e.getLocalizedMessage());
         }catch(BadPaddingException | IllegalBlockSizeException e){
             Respuesta("Error: en el cifrado");
         }catch(IOException e){
             Respuesta("Error: " + e.getLocalizedMessage());
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
     }
 
     private void Certificado() {
+        String alias = "";
         try {
-            String alias = in.readUTF();
+            alias = in.readUTF();
             String certBS64 = in.readUTF(); // Con esto se lee el formato
             byte[] cByte = Base64.getDecoder().decode(certBS64);
 
+            kStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            kStore.load(null, null);
+
             CertificateFactory cFactory = CertificateFactory.getInstance("X.509");
             Certificate cert = cFactory.generateCertificate(new ByteArrayInputStream(cByte));
-            Server.kStore.setCertificateEntry(alias, cert); // Almacenamos el cert
+            kStore.setCertificateEntry(alias, cert); // Almacenamos el cert
+
+            MessageDigest md = MessageDigest.getInstance(certBS64);
+            md.update(certBS64.getBytes());
+            String hashBS64 = Base64.getEncoder().encodeToString(md.digest());
+            Respuesta("OK: " + hashBS64);
 
         } catch (SocketTimeoutException e) {
             Respuesta("Error: Tiempo de espera agotado");
@@ -142,10 +162,16 @@ public class N implements Runnable {
             Respuesta("Error: Se esperaba un certificado o alias valido");
         } catch (IllegalArgumentException e) {
             Respuesta("Error: Fromato Base65 invalido");
-        } catch (CertificateException | KeyStoreException e) {
+        } catch (CertificateException | KeyStoreException | NoSuchAlgorithmException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
         } catch (IOException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
     }
 
@@ -169,6 +195,12 @@ public class N implements Runnable {
             Respuesta("Error: Algoritmo no soportado");
         } catch (IOException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
         }
     }
 

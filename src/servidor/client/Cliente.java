@@ -35,14 +35,14 @@ public class Cliente {
     }
 
     public String sendHashRequest(String algorithm, byte[] data) throws IOException {
-        out.writeUTF("hash");
+        out.writeUTF("Hash");
         out.writeUTF(algorithm);
         out.write(data);
         return in.readUTF();
     }
 
     public String sendCertRequest(String alias, X509Certificate certificate) throws IOException, CertificateEncodingException {
-        out.writeUTF("cert");
+        out.writeUTF("Certificado");
         out.writeUTF(alias);
         String certBase64 = Base64.getEncoder().encodeToString(certificate.getEncoded());
         out.writeUTF(certBase64);
@@ -50,14 +50,14 @@ public class Cliente {
     }
 
     public String sendEncryptRequest(String alias, byte[] data) throws IOException {
-        out.writeUTF("cifrar");
+        out.writeUTF("Cifrar");
         out.writeUTF(alias);
         out.write(data);
         return in.readUTF();
     }
 
     public static void main(String[] args) {
-        Cliente cliente = new Cliente("localhost", 5000);
+        Cliente cliente = new Cliente("localhost", 5050);
 
         try {
             cliente.connect();

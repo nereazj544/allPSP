@@ -17,18 +17,19 @@ public class Server {
 	static KeyStore kStore;
 	public static void main(String[] args) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException {
 		
-		//KEYSTORE
-		kStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		kStore.load(null, null);
 		
-		try (ServerSocket serverSocket = new ServerSocket(5000)) {
+		//KEYSTORE
+		// kStore = KeyStore.getInstance(KeyStore.getDefaultType());
+		// kStore.load(null, null);
+		
+		try (ServerSocket serverSocket = new ServerSocket(5050)) {
 			serverSocket.setSoTimeout(60000);
 
 			ExecutorService executor = Executors.newFixedThreadPool(1000);
-			System.out.println("Servidor ECHO escuchando en puerto 5000");
+			System.out.println("Servidor ECHO escuchando en puerto 5050");
 			while (true) {
 				Socket socket = serverSocket.accept();
-				executor.submit(new N(socket));
+				executor.submit(new N(socket, kStore));
 			}
 		}
 	}

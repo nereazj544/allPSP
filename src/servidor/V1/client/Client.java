@@ -1,4 +1,6 @@
-package servidor.client;
+package servidor.V1.client;
+
+
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

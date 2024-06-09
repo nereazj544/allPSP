@@ -1,4 +1,6 @@
-package servidor.server;
+package servidor.V1.server;
+
+
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -10,7 +12,6 @@ import java.io.UTFDataFormatException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
-import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;

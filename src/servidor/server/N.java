@@ -55,31 +55,8 @@ public class N implements Runnable {
         }
     }
 
-    @Override
-    public void run() {
-        System.out.println("Conectado con: '" + socket.getInetAddress() + "'");
-        try {
-            String respuestaCliente = in.readUTF(); // Leemos la respuesta del cliente.
-            Respuesta(respuestaCliente);
-
-        } catch (SocketTimeoutException e) {
-            Respuesta("ERROR: Tiempo de espera agotado.");
-        } catch (EOFException e) {
-            Respuesta("ERROR: Se esperaba una peticion.");
-        } catch (IOException e) {
-            Respuesta("ERROR: " + e.getLocalizedMessage());
-        // } finally {
-        //     try {
-        //         socket.close(); // Se cierra el socket
-        //     } catch (IOException e) {
-        //         // TODO Auto-generated catch block
-        //         e.printStackTrace();
-        //     }
-        }
-    }
-
-    private void R(String r) {
-        switch (r) {
+    private void Elecion(String respuesta) {
+        switch (respuesta) {
             case "Hash":
                 Hash();
                 break;
@@ -91,7 +68,23 @@ public class N implements Runnable {
                 break;
 
             default:
-                Respuesta(String.format("Error: '%s' no se ha reconocido la peticon", r));
+                Respuesta(String.format("Error: '%s' no se ha reconocido la peticon", respuesta));
+        }
+    }
+
+    @Override
+    public void run() {
+        System.out.println("Conectado con: '" + socket.getInetAddress() + "'");
+        try {
+            String respuesta = in.readUTF(); // Leemos la respuesta del cliente.
+            Respuesta(respuesta);
+
+        } catch (SocketTimeoutException e) {
+            Respuesta("ERROR: Tiempo de espera agotado.");
+        } catch (EOFException e) {
+            Respuesta("ERROR: Se esperaba una peticion.");
+        } catch (IOException e) {
+            Respuesta("ERROR: " + e.getLocalizedMessage());
         }
     }
 
@@ -99,37 +92,37 @@ public class N implements Runnable {
         try {
             kStore = KeyStore.getInstance("pksc12");
             kStore.load(new FileInputStream(System.getProperty("user.dir") + "/res/keystore.p12"), "".toCharArray());
-            
+
             String alias = in.readUTF();
             byte[] data = in.readAllBytes();
 
-
-            Certificate cert =kStore.getCertificate(alias);
+            Certificate cert = kStore.getCertificate(alias);
             // Obtenemos el certificado
 
             if (cert != null) {
                 PublicKey kPublicKey = cert.getPublicKey();
                 if (kPublicKey.getAlgorithm().equals("RSA")) {
-                    //! CIPHER
+                    // ! CIPHER
                     Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
                     cipher.init(Cipher.ENCRYPT_MODE, kPublicKey);
-                    
-                    byte[] e = cipher.doFinal(data); //Ciframos los datos
+
+                    byte[] e = cipher.doFinal(data); // Ciframos los datos
                     String eBS64 = Base64.getEncoder().encodeToString(e);
                     Respuesta("Ok: " + eBS64);
-                }else{
+                } else {
                     Respuesta("Error: algoritmo de clave no soportada");
                 }
-            }else{
+            } else {
                 Respuesta("Error: Certificado no encontrado");
             }
         } catch (SocketTimeoutException e) {
             Respuesta("Error: Tiempo de espera agotado");
-        } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | CertificateException  e) {
+        } catch (KeyStoreException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+                | CertificateException e) {
             Respuesta(e.getLocalizedMessage());
-        }catch(BadPaddingException | IllegalBlockSizeException e){
+        } catch (BadPaddingException | IllegalBlockSizeException e) {
             Respuesta("Error: en el cifrado");
-        }catch(IOException e){
+        } catch (IOException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
         }
     }
@@ -163,7 +156,7 @@ public class N implements Runnable {
             Respuesta("Error: " + e.getLocalizedMessage());
         } catch (IOException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
-            
+
         }
     }
 
@@ -187,7 +180,7 @@ public class N implements Runnable {
             Respuesta("Error: Algoritmo no soportado");
         } catch (IOException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
-            
+
         }
     }
 

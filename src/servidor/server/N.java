@@ -4,11 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UTFDataFormatException;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.security.InvalidKeyException;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
@@ -95,11 +97,12 @@ public class N implements Runnable {
 
     private void Cifrar() {
         try {
+            kStore = KeyStore.getInstance("pksc12");
+            kStore.load(new FileInputStream(System.getProperty("user.dir") + "/res/keystore.p12"), "".toCharArray());
+            
             String alias = in.readUTF();
             byte[] data = in.readAllBytes();
 
-            kStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            kStore.load(null, null);
 
             Certificate cert =kStore.getCertificate(alias);
             // Obtenemos el certificado
@@ -128,12 +131,6 @@ public class N implements Runnable {
             Respuesta("Error: en el cifrado");
         }catch(IOException e){
             Respuesta("Error: " + e.getLocalizedMessage());
-            try {
-                socket.close();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
         }
     }
 
@@ -145,7 +142,7 @@ public class N implements Runnable {
             byte[] cByte = Base64.getDecoder().decode(certBS64);
 
             kStore = KeyStore.getInstance(KeyStore.getDefaultType());
-            kStore.load(null, null);
+            kStore.load(null);
 
             CertificateFactory cFactory = CertificateFactory.getInstance("X.509");
             Certificate cert = cFactory.generateCertificate(new ByteArrayInputStream(cByte));
@@ -166,12 +163,7 @@ public class N implements Runnable {
             Respuesta("Error: " + e.getLocalizedMessage());
         } catch (IOException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
-            try {
-                socket.close();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+            
         }
     }
 
@@ -195,12 +187,7 @@ public class N implements Runnable {
             Respuesta("Error: Algoritmo no soportado");
         } catch (IOException e) {
             Respuesta("Error: " + e.getLocalizedMessage());
-            try {
-                socket.close();
-            } catch (IOException e1) {
-                // TODO Auto-generated catch block
-                e1.printStackTrace();
-            }
+            
         }
     }
 
